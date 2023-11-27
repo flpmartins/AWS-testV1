@@ -1,5 +1,6 @@
-const AWS = require('aws-sdk')
 require('dotenv').config
+const AWS = require('aws-sdk')
+
 const AWSListObjectService = require('../service/AWSListObjectService')
 const AWSUploadService = require('../service/AWSUploadObjectService')
 const AWSUploadV2Service = require('../service/AWSUploadV2Service')
@@ -57,13 +58,13 @@ module.exports = {
   async UploadObjectBucket(request, response) {
     try {
       const { key, bucket } = request.query
-      const { text } = request.body
+      const { file } = request.body
 
-      if (!text) {
+      if (!file) {
         return response.status(400).json({ error: 'Nenhum arquivo enviado' })
       }
 
-      const uploadResponse = await AWSUploadService.uploadFile(text, key, bucket)
+      const uploadResponse = await AWSUploadService.uploadFile(file, key, bucket)
 
       return response.json({ uploadResponse })
     } catch (error) {
@@ -74,15 +75,15 @@ module.exports = {
   async uploadObjectToS3(request, response) {
     try {
       const { key, bucket } = request.query
-      const { file, text } = request.body
+      const { uploadFile } = request.body
 
-      if (!file && !text) {
+      if (uploadFile) {
         return response.status(400).json({ error: 'Nenhum arquivo ou texto enviado' })
       }
 
-      const contentType = file ? file.mimetype : 'application/json'
+      const contentType = 'application/json'
 
-      const data = file ? file.buffer.toString('utf-8') : text
+      const data = uploadFile
 
       const presignedUrl = await s3Service.getPresignedUrl(key, contentType)
 

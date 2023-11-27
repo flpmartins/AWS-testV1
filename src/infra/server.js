@@ -1,7 +1,6 @@
 require('dotenv').config()
 
 const express = require('express')
-const fileUpload = require('express-fileupload');
 
 const routes = require('./routes')
 
